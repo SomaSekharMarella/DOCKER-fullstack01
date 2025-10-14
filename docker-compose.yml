@@ -13,7 +13,7 @@ services:
       - springboot-mysql-net
 
   backend:
-    image: leelaakash/Apartment-backend:latest
+    image: leelaakash/apartment-backend:latest
     container_name: springboot
     ports:
       - "2025:2003"
@@ -24,7 +24,7 @@ services:
       - springboot-mysql-net
 
   frontend:
-    image: leelaakash/Apartment-frontend:latest
+    image: leelaakash/apartment-frontend:latest
     container_name: react
     ports:
       - "3000:80"
