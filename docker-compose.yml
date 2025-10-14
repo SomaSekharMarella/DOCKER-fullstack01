@@ -11,38 +11,31 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - springboot-mysql-net
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pdocker"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
 
   backend:
     image: leelaakash/apartment-backend:latest
     container_name: springboot
     ports:
       - "2025:2003"
+    depends_on:
+      - mysqldb
     restart: on-failure
     networks:
       - springboot-mysql-net
-    depends_on:
-      mysqldb:
-        condition: service_healthy
 
   frontend:
     image: leelaakash/apartment-frontend:latest
     container_name: react
     ports:
       - "3000:80"
+    depends_on:
+      - backend
     restart: on-failure
     networks:
       - springboot-mysql-net
-    depends_on:
-      - backend
 
-volumes:
+ volumes:
   mysql_data:
 
-networks:
+ networks:
   springboot-mysql-net:
