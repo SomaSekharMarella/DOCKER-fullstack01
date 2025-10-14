@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./style.css";
 
-// Base URL from environment
-const BASE_URL = import.meta.env.VITE_API_URL;
+// Detect if running inside Docker
+const isDocker = window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1";
+
+// BASE_URL: Docker container uses backend service name; local uses env variable
+const BASE_URL = isDocker ? "http://backend:2003" : import.meta.env.VITE_API_URL;
 
 const ApartmentManager = () => {
   const [apartments, setApartments] = useState([]);
