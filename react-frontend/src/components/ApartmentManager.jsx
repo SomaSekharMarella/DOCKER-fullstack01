@@ -2,17 +2,22 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./style.css";
 
-// Use environment variable
-const API_URL = import.meta.env.VITE_API_URL;
+// Base URL from environment
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 const ApartmentManager = () => {
   const [apartments, setApartments] = useState([]);
   const [form, setForm] = useState({ name: "", location: "", rent: "", status: "Available" });
   const [editId, setEditId] = useState(null);
 
+  // Fetch all apartments
   const fetchApartments = async () => {
-    const res = await axios.get(API_URL);
-    setApartments(res.data);
+    try {
+      const res = await axios.get(`${BASE_URL}/api/apartments`);
+      setApartments(res.data);
+    } catch (error) {
+      console.error("Error fetching apartments:", error);
+    }
   };
 
   useEffect(() => {
@@ -23,19 +28,27 @@ const ApartmentManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editId) {
-      await axios.put(`${API_URL}/${editId}`, form);
-    } else {
-      await axios.post(API_URL, form);
+    try {
+      if (editId) {
+        await axios.put(`${BASE_URL}/api/apartments/${editId}`, form);
+      } else {
+        await axios.post(`${BASE_URL}/api/apartments`, form);
+      }
+      setForm({ name: "", location: "", rent: "", status: "Available" });
+      setEditId(null);
+      fetchApartments();
+    } catch (error) {
+      console.error("Error submitting form:", error);
     }
-    setForm({ name: "", location: "", rent: "", status: "Available" });
-    setEditId(null);
-    fetchApartments();
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`${API_URL}/${id}`);
-    fetchApartments();
+    try {
+      await axios.delete(`${BASE_URL}/api/apartments/${id}`);
+      fetchApartments();
+    } catch (error) {
+      console.error("Error deleting apartment:", error);
+    }
   };
 
   const handleEdit = (apt) => {
@@ -44,8 +57,12 @@ const ApartmentManager = () => {
   };
 
   const handleToggleStatus = async (id) => {
-    await axios.patch(`${API_URL}/${id}/toggle-status`);
-    fetchApartments();
+    try {
+      await axios.patch(`${BASE_URL}/api/apartments/${id}/toggle-status`);
+      fetchApartments();
+    } catch (error) {
+      console.error("Error toggling status:", error);
+    }
   };
 
   return (
@@ -53,9 +70,30 @@ const ApartmentManager = () => {
       <h2>RentWise – Apartments</h2>
 
       <form onSubmit={handleSubmit} className="apartment-form">
-        <input type="text" name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-        <input type="text" name="location" placeholder="Location" value={form.location} onChange={handleChange} required />
-        <input type="number" name="rent" placeholder="Rent" value={form.rent} onChange={handleChange} required />
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="text"
+          name="location"
+          placeholder="Location"
+          value={form.location}
+          onChange={handleChange}
+          required
+        />
+        <input
+          type="number"
+          name="rent"
+          placeholder="Rent"
+          value={form.rent}
+          onChange={handleChange}
+          required
+        />
         <select name="status" value={form.status} onChange={handleChange}>
           <option>Available</option>
           <option>Occupied</option>
